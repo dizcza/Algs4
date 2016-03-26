@@ -1,5 +1,4 @@
 import edu.princeton.cs.algs4.Digraph;
-import edu.princeton.cs.algs4.Queue;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -14,78 +13,9 @@ import java.util.Set;
 
 public class WordNet {
 
-    private final static byte BLUE = 1;
-    private final static byte CYAN = 2;
-    private final static byte MIXED = BLUE | CYAN;
-
     private final List<String> synsets = new ArrayList<>();
     private final Map<String, Set<Integer>> map = new HashMap<>();
-    private final Digraph digraph;
-    private final int V;
-
-    private class SAP {
-        private int shortestDistance = Integer.MAX_VALUE;
-        private String ancestor;
-
-        private boolean opposite(final byte c1, final byte c2) {
-            return (c1 | c2) == MIXED;
-        }
-
-        private void verifyNoun(String noun) {
-            if (!isNoun(noun)) {
-                throw new IllegalArgumentException();
-            }
-        }
-
-        private SAP(String nounA, String nounB) {
-            verifyNoun(nounA);
-            verifyNoun(nounB);
-            if (nounA.equals(nounB)) {
-                ancestor = nounA;
-                shortestDistance = 0;
-                return;
-            }
-            byte[] color = new byte[V];
-            int[] distance = new int[V];
-            for (int vertex = 0; vertex < V; ++vertex) {
-                distance[vertex] = Integer.MAX_VALUE;
-            }
-            Queue<Integer> queue = new Queue<>();
-            for (int va : map.get(nounA)) {
-                queue.enqueue(va);
-                color[va] = CYAN;
-                distance[va] = 0;
-            }
-            for (int vb : map.get(nounB)) {
-                queue.enqueue(vb);
-                color[vb] = BLUE;
-                distance[vb] = 0;
-            }
-            while (!queue.isEmpty()) {
-                int vertex = queue.dequeue();
-                for (int vi : digraph.adj(vertex)) {
-                    if (color[vi] == 0) {
-                        color[vi] = color[vertex];
-                        distance[vi] = distance[vertex] + 1;
-                        queue.enqueue(vi);
-                    }
-                    else if (opposite(color[vertex], color[vi])) {
-                        color[vi] = MIXED;
-                        distance[vi] = distance[vertex] + 1;
-                    }
-                }
-            }
-            for (int vertex = 0; vertex < V; ++vertex) {
-                if (color[vertex] == MIXED && distance[vertex] < shortestDistance) {
-                    shortestDistance = distance[vertex];
-                    ancestor = synsets.get(vertex);
-                }
-            }
-            if (shortestDistance == Integer.MAX_VALUE) {
-                shortestDistance = -1;
-            }
-        }
-    }
+    private final SAP sap;
 
     // constructor takes the name of the two input files.
     // The constructor should take time linearithmic (or better) in the input size
@@ -107,8 +37,7 @@ public class WordNet {
                 map.put(synonym, vertices);
             }
         }
-        V = synsets.size();
-        digraph = new Digraph(V);
+        Digraph digraph = new Digraph(synsets.size());
         reader = new BufferedReader(new FileReader(hypernymsName));
         while (reader.ready()) {
             String line = reader.readLine();
@@ -119,6 +48,7 @@ public class WordNet {
                 digraph.addEdge(v, w);
             }
         }
+        sap = new SAP(digraph);
     }
 
     // returns all WordNet nouns
@@ -133,23 +63,34 @@ public class WordNet {
         return map.get(word) != null;
     }
 
+    private void verifyNoun(String word) {
+        if (!isNoun(word)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     // shortestDistance between nounA and nounB (defined below);
     // linear in the size of the WordNet digraph
     public int distance(String nounA, String nounB) {
-        return new SAP(nounA, nounB).shortestDistance;
+        verifyNoun(nounA);
+        verifyNoun(nounB);
+        return sap.length(map.get(nounA), map.get(nounB));
     }
 
     // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
     // in a shortest ancestral path (defined below);
     // linear in the size of the WordNet digraph
     public String sap(String nounA, String nounB) {
-        return new SAP(nounA, nounB).ancestor;
+        verifyNoun(nounA);
+        verifyNoun(nounB);
+        int ancestor = sap.ancestor(map.get(nounA), map.get(nounB));
+        return synsets.get(ancestor);
     }
 
     // do unit testing of this class
     public static void main(String[] args) throws IOException {
         WordNet wordNet = new WordNet("Lab6_WordNet/wordnet/mysyn.txt", "Lab6_WordNet/wordnet/myhyp.txt");
-        boolean isNoun = wordNet.isNoun("I");
+        boolean isNoun = wordNet.isNoun("O");
         isNoun = wordNet.isNoun("G");
         isNoun = wordNet.isNoun("D");
         int d = wordNet.distance("A", "H");
