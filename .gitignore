@@ -1,0 +1,7 @@
+.idea/*
+production/*
+*.txt
+*.iml
+*.png
+Lab1_Percolation/testing/CREDITS
+*.class
