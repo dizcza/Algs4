@@ -11,112 +11,24 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 
+import static javafx.scene.input.KeyCode.V;
+
 
 public class SAP {
 
-    private final Digraph digraph;
-    private final int V;
-
-    private class BFS {
-
-        private final static byte RED = 1;
-        private final static byte BLUE = 2;
-
-        private final static int INFINITY = Integer.MAX_VALUE;
-
-        private int shortestDistance = INFINITY;
-        private int ancestor = -1;
-
-        private void verifyBounds(int vertex) {
-            if (vertex < 0 || vertex >= V) {
-                throw new IndexOutOfBoundsException();
-            }
-        }
-
-        private boolean intersects(Iterable<Integer> vFrom, Iterable<Integer> vTo) {
-            Set<Integer> patch = new HashSet<>();
-            for (int va : vFrom) {
-                verifyBounds(va);
-                patch.add(va);
-            }
-            for (int vb : vTo) {
-                verifyBounds(vb);
-                if (patch.contains(vb)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void verifyNotEmpty(Iterable<Integer> vertices) {
-            Objects.requireNonNull(vertices);
-            if (!vertices.iterator().hasNext()) {
-                throw new IllegalArgumentException();
-            }
-        }
-
-        private BFS(Iterable<Integer> vFrom, Iterable<Integer> vTo) {
-            verifyNotEmpty(vFrom);
-            verifyNotEmpty(vTo);
-            if (intersects(vFrom, vTo)) {
-                shortestDistance = 0;
-                ancestor = vFrom.iterator().next();
-                return;
-            }
-            Queue<Integer> queue = new Queue<>();
-            byte[] color = new byte[V];
-            Map<Byte, Integer[]> paintedDistance = new HashMap<>();
-            paintedDistance.put(RED, new Integer[V]);
-            paintedDistance.put(BLUE, new Integer[V]);
-            for (int vertex = 0; vertex < V; ++vertex) {
-                paintedDistance.get(RED)[vertex] = INFINITY;
-                paintedDistance.get(BLUE)[vertex] = INFINITY;
-            }
-            for (int va : vFrom) {
-                queue.enqueue(va);
-                color[va] = RED;
-                paintedDistance.get(RED)[va] = 0;
-            }
-            for (int vb : vTo) {
-                queue.enqueue(vb);
-                color[vb] = BLUE;
-                paintedDistance.get(BLUE)[vb] = 0;
-            }
-            while (!queue.isEmpty()) {
-                int vertex = queue.dequeue();
-                for (int vi : digraph.adj(vertex)) {
-                    Integer[] dist = paintedDistance.get(color[vertex]);
-                    dist[vi] = dist[vertex] + 1;
-                    if (color[vi] == 0) {
-                        color[vi] = color[vertex];
-                        queue.enqueue(vi);
-                    }
-                }
-            }
-            for (int vertex = 0; vertex < V; ++vertex) {
-                int d1 = paintedDistance.get(RED)[vertex];
-                int d2 = paintedDistance.get(BLUE)[vertex];
-                if (d1 != INFINITY && d2 != INFINITY && d1 + d2 < shortestDistance) {
-                    shortestDistance = d1 + d2;
-                    ancestor = vertex;
-                }
-            }
-            if (shortestDistance == INFINITY) {
-                shortestDistance = -1;
-            }
-        }
-    }
+    private final DeluxeBFS bfs;
 
     // constructor takes a digraph (not necessarily a DAG)
     public SAP(Digraph G) {
         Objects.requireNonNull(G);
-        V = G.V();
-        digraph = new Digraph(V);
-        for (int vertex = 0; vertex < V; ++vertex) {
+        int size = G.V();
+        Digraph digraph = new Digraph(size);
+        for (int vertex = 0; vertex < size; ++vertex) {
             for (int w : G.adj(vertex)) {
                 digraph.addEdge(vertex, w);
             }
         }
+        bfs = new DeluxeBFS(digraph);
     }
 
     // length of shortest ancestral path between v and w;
@@ -142,13 +54,13 @@ public class SAP {
     // length of shortest ancestral path between any vertex in v and any vertex in w;
     // -1 if no such path
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
-        return new BFS(v, w).shortestDistance;
+        return bfs.length(v, w);
     }
 
     // a common ancestor that participates in shortest ancestral path;
     // -1 if no such path
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
-        return new BFS(v, w).ancestor;
+        return bfs.ancestor(v, w);
     }
 
     // do unit testing of this class
