@@ -58,15 +58,19 @@ public class SAP {
 
     // do unit testing of this class
     public static void main(String[] args) {
-        In in = new In("Lab6_WordNet/wordnet/digraph1.txt");
+        In in;
+        if (args.length > 0) {
+            in = new In("../testing/" + args[0]);
+        }
+        else {
+            in = new In("Lab6_WordNet/testing/digraph6.txt");
+        }
         Digraph G = new Digraph(in);
         SAP sap = new SAP(G);
-        while (!StdIn.isEmpty()) {
-            int v = StdIn.readInt();
-            int w = StdIn.readInt();
-            int length   = sap.length(v, w);
-            int ancestor = sap.ancestor(v, w);
-            StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
-        }
+        int v = StdIn.readInt();
+        int w = StdIn.readInt();
+        int length   = sap.length(v, w);
+        int ancestor = sap.ancestor(v, w);
+        StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
     }
 }

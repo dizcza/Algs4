@@ -3,6 +3,7 @@ import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.Graph;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,8 +40,15 @@ public class WordNet {
                 map.put(synonym, vertices);
             }
         }
+        reader.close();
+        Digraph digraph = parseHypernyms(hypernymsName);
+        verifyRootDAG(digraph);
+        sap = new SAP(digraph);
+    }
+
+    private Digraph parseHypernyms(String hypernymsName) throws IOException {
         Digraph digraph = new Digraph(synsets.size());
-        reader = new BufferedReader(new FileReader(hypernymsName));
+        BufferedReader reader = new BufferedReader(new FileReader(hypernymsName));
         while (reader.ready()) {
             String line = reader.readLine();
             String[] parts = line.split(",");
@@ -50,8 +58,8 @@ public class WordNet {
                 digraph.addEdge(v, w);
             }
         }
-        verifyRootDAG(digraph);
-        sap = new SAP(digraph);
+        reader.close();
+        return digraph;
     }
 
     private void verifyRootDAG(Digraph digraph) {

@@ -76,21 +76,28 @@ public class DeluxeBFS {
             paintedDistance.get(RED)[vertex] = INFINITY;
             paintedDistance.get(BLUE)[vertex] = INFINITY;
         }
+        Map<Byte, Boolean[]> marked = new HashMap<>();
+        marked.put(RED, new Boolean[V]);
+        marked.put(BLUE, new Boolean[V]);
         for (int va : vFrom) {
             queue.enqueue(va);
             color[va] = RED;
             paintedDistance.get(RED)[va] = 0;
+            marked.get(RED)[va] = true;
         }
         for (int vb : vTo) {
             queue.enqueue(vb);
             color[vb] = BLUE;
             paintedDistance.get(BLUE)[vb] = 0;
+            marked.get(BLUE)[vb] = true;
         }
         while (!queue.isEmpty()) {
             int vertex = queue.dequeue();
             for (int vi : digraph.adj(vertex)) {
                 Integer[] dist = paintedDistance.get(color[vertex]);
-                dist[vi] = dist[vertex] + 1;
+                if (dist[vertex] + 1 < dist[vi]) {
+                    dist[vi] = dist[vertex] + 1;
+                }
                 if (color[vi] == 0) {
                     // todo: check d1 + d2 < distSoFar here
                     color[vi] = color[vertex];
