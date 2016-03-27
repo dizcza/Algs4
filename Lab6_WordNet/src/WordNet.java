@@ -106,7 +106,7 @@ public class WordNet {
 
     // do unit testing of this class
     public static void main(String[] args) throws IOException {
-        WordNet wordNet = new WordNet("Lab6_WordNet/wordnet/mysyn.txt", "Lab6_WordNet/wordnet/myhyp.txt");
+        WordNet wordNet = new WordNet("Lab6_WordNet/testing/mysyn.txt", "Lab6_WordNet/testing/myhyp.txt");
         boolean isNoun = wordNet.isNoun("O");
         isNoun = wordNet.isNoun("G");
         isNoun = wordNet.isNoun("D");
