@@ -6,8 +6,6 @@ import edu.princeton.cs.algs4.Queue;
  * Created by dizcza on 26.03.16.
  */
 public class DeluxeBFS {
-    private final static int INFINITY = Integer.MAX_VALUE;
-
     private final Digraph digraph;
     private final int V;
 
@@ -20,29 +18,6 @@ public class DeluxeBFS {
 
     public int distTo(int vertex) {
         return distTo[vertex];
-    }
-
-    private static class Pair {
-        private final int a;
-        private final int b;
-
-        private Pair(int a, int b) {
-            this.a = a;
-            this.b = b;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (this.getClass() != obj.getClass()) return false;
-            Pair other = (Pair) obj;
-            return this.a == other.a && this.b == other.b;
-        }
-
-        @Override
-        public int hashCode() {
-            return a + b;
-        }
     }
 
     public DeluxeBFS(Digraph digraph, Iterable<Integer> sources) {

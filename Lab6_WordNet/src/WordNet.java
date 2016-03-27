@@ -3,7 +3,6 @@ import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.Graph;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +45,10 @@ public class WordNet {
         sap = new SAP(digraph);
     }
 
+    private void verifyRootDAG(Digraph digraph) {
+        new DepthFirstSearchCycle(digraph);
+    }
+
     private Digraph parseHypernyms(String hypernymsName) throws IOException {
         Digraph digraph = new Digraph(synsets.size());
         BufferedReader reader = new BufferedReader(new FileReader(hypernymsName));
@@ -62,19 +65,7 @@ public class WordNet {
         return digraph;
     }
 
-    private void verifyRootDAG(Digraph digraph) {
-        final int size = digraph.V();
-        Graph testGraph = new Graph(size);
-        for (int vertex = 0; vertex < size; ++vertex) {
-            for (int w : digraph.adj(vertex)) {
-                testGraph.addEdge(vertex, w);
-            }
-        }
-        DepthFirstSearch dfs = new DepthFirstSearch(testGraph, 0);
-        if (dfs.count() != size) {
-            throw new IllegalArgumentException("Not a rooted DAG.");
-        }
-    }
+
 
     // returns all WordNet nouns
     public Iterable<String> nouns() {
@@ -90,7 +81,7 @@ public class WordNet {
 
     private void verifyNoun(String word) {
         if (!isNoun(word)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(word + " is not a noun.");
         }
     }
 
@@ -114,15 +105,15 @@ public class WordNet {
 
     // do unit testing of this class
     public static void main(String[] args) throws IOException {
-        WordNet wordNet = new WordNet("Lab6_WordNet/testing/mysyn.txt", "Lab6_WordNet/testing/myhyp.txt");
-        boolean isNoun = wordNet.isNoun("O");
-        isNoun = wordNet.isNoun("G");
-        isNoun = wordNet.isNoun("D");
-        int d = wordNet.distance("A", "H");
-        d = wordNet.distance("B", "F");
-        d = wordNet.distance("H", "E");
-        String anc = wordNet.sap("E", "A");
-        anc = wordNet.sap("B", "E");
-        anc = wordNet.sap("B", "F");
+        String s, h;
+        if (args.length == 2) {
+            s = "../testing/" + args[0];
+            h = "../testing/" + args[1];
+        }
+        else {
+            s = "Lab6_WordNet/testing/synsets.txt";
+            h = "Lab6_WordNet/testing/hypernyms.txt";
+        }
+        WordNet wordNet = new WordNet(s, h);
     }
 }
