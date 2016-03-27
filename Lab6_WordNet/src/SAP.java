@@ -9,19 +9,34 @@ import java.util.Stack;
 
 public class SAP {
 
-    private final DeluxeBFS bfs;
+    private final Digraph digraph;
+    private final int V;
+
+    private static class Ancestor {
+        private final int vertex;
+        private final int length;
+
+        private Ancestor(int vertex, int length) {
+            this.vertex = vertex;
+            this.length = length;
+        }
+
+        @Override
+        public int hashCode() {
+            return vertex + length;
+        }
+    }
 
     // constructor takes a digraph (not necessarily a DAG)
     public SAP(Digraph G) {
         Objects.requireNonNull(G);
-        int size = G.V();
-        Digraph digraph = new Digraph(size);
-        for (int vertex = 0; vertex < size; ++vertex) {
+        V = G.V();
+        digraph = new Digraph(V);
+        for (int vertex = 0; vertex < V; ++vertex) {
             for (int w : G.adj(vertex)) {
                 digraph.addEdge(vertex, w);
             }
         }
-        bfs = new DeluxeBFS(digraph);
     }
 
     // length of shortest ancestral path between v and w;
@@ -44,16 +59,39 @@ public class SAP {
         return ancestor(vIterable, wIterable);
     }
 
+    private Ancestor doubleBfs(Iterable<Integer> v, Iterable<Integer> w) {
+        DeluxeBFS bfsFrom = new DeluxeBFS(digraph, v);
+        DeluxeBFS bfsTo = new DeluxeBFS(digraph, w);
+
+        int length = Integer.MAX_VALUE;
+        int ancestor = -1;
+        for (int vertex = 0; vertex < V; ++vertex) {
+            if (bfsFrom.hasPathTo(vertex) && bfsTo.hasPathTo(vertex)) {
+                int vDist = bfsFrom.distTo(vertex) + bfsTo.distTo(vertex);
+                if (vDist < length) {
+                    length = vDist;
+                    ancestor = vertex;
+                }
+            }
+        }
+
+        if (length == Integer.MAX_VALUE) {
+            length = -1;
+        }
+
+        return new Ancestor(ancestor, length);
+    }
+
     // length of shortest ancestral path between any vertex in v and any vertex in w;
     // -1 if no such path
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
-        return bfs.length(v, w);
+        return doubleBfs(v, w).length;
     }
 
     // a common ancestor that participates in shortest ancestral path;
     // -1 if no such path
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
-        return bfs.ancestor(v, w);
+        return doubleBfs(v, w).vertex;
     }
 
     // do unit testing of this class

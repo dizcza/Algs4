@@ -21,11 +21,11 @@ public class Outcast {
         Objects.requireNonNull(nouns);
         if (nouns.length == 0) return null;
         int[] distance = new int[nouns.length];
-        for (int i = 0; i < nouns.length; ++i) {
-            for (int j = 0; j < nouns.length; ++j) {
-                if (i != j) {
-                    distance[i] += wordNet.distance(nouns[i], nouns[j]);
-                }
+        for (int i = 0; i < nouns.length - 1; ++i) {
+            for (int j = i + 1; j < nouns.length; ++j) {
+                int dij = wordNet.distance(nouns[i], nouns[j]);
+                distance[i] += dij;
+                distance[j] += dij;
             }
         }
         int maxDist = distance[0];
