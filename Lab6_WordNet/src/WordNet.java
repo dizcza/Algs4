@@ -1,4 +1,6 @@
+import edu.princeton.cs.algs4.DepthFirstSearch;
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.Graph;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -48,7 +50,22 @@ public class WordNet {
                 digraph.addEdge(v, w);
             }
         }
+        verifyRootDAG(digraph);
         sap = new SAP(digraph);
+    }
+
+    private void verifyRootDAG(Digraph digraph) {
+        final int size = digraph.V();
+        Graph testGraph = new Graph(size);
+        for (int vertex = 0; vertex < size; ++vertex) {
+            for (int w : digraph.adj(vertex)) {
+                testGraph.addEdge(vertex, w);
+            }
+        }
+        DepthFirstSearch dfs = new DepthFirstSearch(testGraph, 0);
+        if (dfs.count() != size) {
+            throw new IllegalArgumentException("Not a rooted DAG.");
+        }
     }
 
     // returns all WordNet nouns

@@ -16,6 +16,7 @@ public class DeluxeBFS {
     private final static byte RED = 1;
     private final static byte BLUE = 2;
 
+    private final Ancestor invalidAncestor = new Ancestor(-1, -1);
     private final Digraph digraph;
     private final int V;
 
@@ -55,16 +56,12 @@ public class DeluxeBFS {
         return false;
     }
 
-    private void verifyNotEmpty(Iterable<Integer> vertices) {
-        Objects.requireNonNull(vertices);
-        if (!vertices.iterator().hasNext()) {
-            throw new IllegalArgumentException();
-        }
-    }
-
     private Ancestor findAncestor(Iterable<Integer> vFrom, Iterable<Integer> vTo) {
-        verifyNotEmpty(vFrom);
-        verifyNotEmpty(vTo);
+        Objects.requireNonNull(vFrom);
+        Objects.requireNonNull(vTo);
+        if (!vFrom.iterator().hasNext() || !vTo.iterator().hasNext()) {
+            return invalidAncestor;
+        }
         int length = INFINITY;
         int ancestorV = -1;
         if (intersects(vFrom, vTo)) {
