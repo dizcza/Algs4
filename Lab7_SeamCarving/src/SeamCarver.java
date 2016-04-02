@@ -145,10 +145,42 @@ public class SeamCarver {
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam) {
         Objects.requireNonNull(seam);
+        if (!horizontal) {
+            transpose();
+        }
+        removeVerticalSeam(seam);
+        transpose();
+    }
+
+    private void verifySeamLength(int[] seam, int len) {
+        if (seam.length != len) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private void verifySeamRange(int[] seam) {
+        for (int i = 1; i < seam.length; ++i) {
+            int shift = seam[i] - seam[i-1];
+            if (shift < -1 || shift > 1) {
+                throw new IllegalArgumentException();
+            }
+        }
     }
 
     // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam) {
         Objects.requireNonNull(seam);
+        verifySeamLength(seam, height());
+        verifySeamRange(seam);
+        Picture shrunk = new Picture(width() - 1, height());
+        for (int y = 0; y < height(); ++y) {
+            for (int x = 0; x < seam[y]; ++x) {
+                shrunk.set(x, y, picture.get(x, y));
+            }
+            for (int x = seam[y]; x < width() - 1; ++x) {
+                shrunk.set(x, y, picture.get(x + 1, y));
+            }
+        }
+        picture = shrunk;
     }
 }

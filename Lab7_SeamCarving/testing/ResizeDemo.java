@@ -18,7 +18,7 @@ public class ResizeDemo {
     public static void main(String[] args) {
         if (args.length != 3) {
             StdOut.println("Usage:\njava ResizeDemo [image filename] [num cols to remove] [num rows to remove]");
-            return;
+            args = new String[] {"Lab7_SeamCarving/testing/HJocean.png", "10", "5"};
         }
 
         Picture inputImg = new Picture(args[0]);
