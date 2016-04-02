@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.Picture;
 
+import java.awt.Color;
 import java.util.Objects;
 
 public class SeamCarver {
@@ -16,7 +17,7 @@ public class SeamCarver {
 
     // current picture
     public Picture picture() {
-        return picture;
+        return new Picture(picture);
     }
 
     // width of current picture
@@ -33,16 +34,19 @@ public class SeamCarver {
         return x == 0 || x == width() - 1 || y == 0 || y == height() - 1;
     }
 
-    private float[] rgb(int x, int y) {
-        float[] flatten = new float[3];
-        picture.get(x, y).getColorComponents(flatten);
+    private double[] rgb(int x, int y) {
+        double[] flatten = new double[3];
+        Color color = picture.get(x, y);
+        flatten[0] = color.getRed();
+        flatten[1] = color.getGreen();
+        flatten[2] = color.getBlue();
         return flatten;
     }
 
     private double distSq(int x0, int y0, int x1, int y1) {
-        float[] first = rgb(x0, y0);
-        float[] second = rgb(x1, y1);
-        float distSq = 0.0f;
+        double[] first = rgb(x0, y0);
+        double[] second = rgb(x1, y1);
+        double distSq = 0.0d;
         for (int i = 0; i < 3; ++i) {
             distSq += (second[i] - first[i]) * (second[i] - first[i]);
         }
@@ -69,7 +73,7 @@ public class SeamCarver {
         double dxSq = distSq(x-1, y, x+1, y);
         double dySq = distSq(x, y-1, x, y+1);
 
-        return 255 * Math.sqrt(dxSq + dySq);
+        return Math.sqrt(dxSq + dySq);
     }
 
     // sequence of indices for horizontal seam
@@ -89,11 +93,11 @@ public class SeamCarver {
     }
 
     private double[][] prepareDistTo() {
-        double[][] distTo = new double[height() - 1][width()];
+        double[][] distTo = new double[height()][width()];
         for (int x = 0; x < width(); ++x) {
             distTo[0][x] = BORDER_ENERGY;
         }
-        for (int y = 1; y < height() - 1; ++y) {
+        for (int y = 1; y < height(); ++y) {
             for (int x = 0; x < width(); ++x) {
                 distTo[y][x] = Double.POSITIVE_INFINITY;
             }
@@ -102,9 +106,10 @@ public class SeamCarver {
     }
 
     private int[][] preparePathTo() {
-        int[][] pathTo = new int[height() - 1][width()];
+        int[][] pathTo = new int[height()][width()];
         for (int x = 0; x < width(); ++x) {
             pathTo[0][x] = x;
+            pathTo[height() - 1][x] = x;
         }
         return pathTo;
     }
@@ -113,7 +118,7 @@ public class SeamCarver {
     public int[] findVerticalSeam() {
         int[][] pathTo = preparePathTo();
         double[][] distTo = prepareDistTo();
-        for (int y = 0; y < height() - 2; ++y) {
+        for (int y = 0; y < height() - 1; ++y) {
             for (int x = 1; x < width() - 1; ++x) {
                 for (int dx = -1; dx <= 1; ++dx) {
                     double e = energy(x + dx, y + 1);
@@ -127,18 +132,16 @@ public class SeamCarver {
         double minDist = Double.POSITIVE_INFINITY;
         int xEnd = 0;
         for (int x = 0; x < width(); ++x) {
-            if (distTo[height() - 2][x] < minDist) {
-                minDist = distTo[height() - 2][x];
+            if (distTo[height() - 1][x] < minDist) {
+                minDist = distTo[height() - 1][x];
                 xEnd = x;
             }
         }
         int[] seam = new int[height()];
         seam[height() - 1] = xEnd;
-        seam[height() - 2] = xEnd;
-        for (int y = height() - 3; y > 0; --y) {
+        for (int y = height() - 2; y >= 0; --y) {
             seam[y] = pathTo[y+1][seam[y+1]];
         }
-        seam[0] = seam[1];
         return seam;
     }
 
@@ -158,7 +161,12 @@ public class SeamCarver {
         }
     }
 
-    private void verifySeamRange(int[] seam) {
+    private void verifySeamRange(int[] seam, int maxElement) {
+        for (int coord : seam) {
+            if (coord < 0 || coord > maxElement) {
+                throw new IllegalArgumentException();
+            }
+        }
         for (int i = 1; i < seam.length; ++i) {
             int shift = seam[i] - seam[i-1];
             if (shift < -1 || shift > 1) {
@@ -171,7 +179,7 @@ public class SeamCarver {
     public void removeVerticalSeam(int[] seam) {
         Objects.requireNonNull(seam);
         verifySeamLength(seam, height());
-        verifySeamRange(seam);
+        verifySeamRange(seam, width() - 1);
         Picture shrunk = new Picture(width() - 1, height());
         for (int y = 0; y < height(); ++y) {
             for (int x = 0; x < seam[y]; ++x) {
