@@ -50,33 +50,10 @@ public class SeamCarver {
         if (isBorder(x, y)) {
             return BORDER_ENERGY;
         }
-        int r = picture.get(x + 1, y).getRGB();
-        int l = picture.get(x - 1, y).getRGB();
-        int t = picture.get(x, y - 1).getRGB();
-        int b = picture.get(x, y + 1).getRGB();
+        float dxSq = delta(x, y, 1, 0);
+        float dySq = delta(x, y, 0, 1);
 
-        float dxSq = 0.0f;
-        float dySq = 0.0f;
-
-        for (int bits = 0; bits <= 16; bits+=8) {
-            float dx = (r >> bits - l >> bits) & 0xFF;
-            float dy = (t >> bits - b >> bits) & 0xFF;
-            dxSq += dx * dx;
-            dySq += dy * dy;
-        }
-
-        float[] right = new float[3];
-        float[] left = new float[3];
-        float dxComp = 0.0f;
-        picture.get(x + 1, y).getColorComponents(right);
-        picture.get(x - 1, y).getColorComponents(left);
-        for (int i = 0; i < 3; ++i) {
-            dxComp += (right[i] - left[i]) * (right[i] - left[i]);
-        }
-
-        System.out.println(dxComp - dxSq);
-
-        return Math.sqrt(dxSq + dySq);
+        return 255 * Math.sqrt(dxSq + dySq);
     }
 
     // sequence of indices for horizontal seam
