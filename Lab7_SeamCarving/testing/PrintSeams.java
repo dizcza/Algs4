@@ -61,6 +61,9 @@ public class PrintSeams {
     }
 
     public static void main(String[] args) {
+        if (args.length == 0) {
+            args = new String[] {"Lab7_SeamCarving/testing/4x6.png"};
+        }
         Picture picture = new Picture(args[0]);
         StdOut.printf("%s (%d-by-%d image)\n", args[0], picture.width(), picture.height());
         StdOut.println();
@@ -77,12 +80,12 @@ public class PrintSeams {
         StdOut.println("}");
         printSeam(carver, verticalSeam, VERTICAL);
 
-        StdOut.printf("Horizontal seam: { ");
-        int[] horizontalSeam = carver.findHorizontalSeam();
-        for (int y : horizontalSeam)
-            StdOut.print(y + " ");
-        StdOut.println("}");
-        printSeam(carver, horizontalSeam, HORIZONTAL);
+//        StdOut.printf("Horizontal seam: { ");
+//        int[] horizontalSeam = carver.findHorizontalSeam();
+//        for (int y : horizontalSeam)
+//            StdOut.print(y + " ");
+//        StdOut.println("}");
+//        printSeam(carver, horizontalSeam, HORIZONTAL);
 
     }
 

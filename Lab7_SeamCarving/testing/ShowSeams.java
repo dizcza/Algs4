@@ -30,13 +30,16 @@ public class ShowSeams {
     }
 
     public static void main(String[] args) {
+        if (args.length == 0) {
+            args = new String[] {"Lab7_SeamCarving/testing/HJocean.png"};
+        }
         Picture picture = new Picture(args[0]);
         StdOut.printf("image is %d columns by %d rows\n", picture.width(), picture.height());
         picture.show();        
         SeamCarver sc = new SeamCarver(picture);
         
-        StdOut.printf("Displaying horizontal seam calculated.\n");
-        showHorizontalSeam(sc);
+//        StdOut.printf("Displaying horizontal seam calculated.\n");
+//        showHorizontalSeam(sc);
 
         StdOut.printf("Displaying vertical seam calculated.\n");
         showVerticalSeam(sc);
