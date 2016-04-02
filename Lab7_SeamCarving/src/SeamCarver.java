@@ -7,6 +7,7 @@ public class SeamCarver {
     private final static double BORDER_ENERGY = 1000d;
 
     private Picture picture;
+    private boolean horizontal = false;
 
     // create a seam carver object based on the given picture
     public SeamCarver(Picture picture) {
@@ -48,6 +49,17 @@ public class SeamCarver {
         return distSq;
     }
 
+    private void transpose() {
+        Picture transposed = new Picture(height(), width());
+        for (int x = 0; x < width(); ++x) {
+            for (int y = 0; y < height(); ++y) {
+                transposed.set(y, x, picture.get(x, y));
+            }
+        }
+        picture = transposed;
+        horizontal = !horizontal;
+    }
+
     // energy of pixel at column x and row y
     public double energy(int x, int y) {
         verifyIndices(x, y);
@@ -62,7 +74,12 @@ public class SeamCarver {
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
-        return null;
+        if (!horizontal) {
+            transpose();
+        }
+        int[] seam = findVerticalSeam();
+        transpose();
+        return seam;
     }
 
     private void verifyIndices(int x, int y) {
