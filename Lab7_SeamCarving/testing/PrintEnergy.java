@@ -16,7 +16,7 @@ public class PrintEnergy {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            args = new String[] {"Lab7_SeamCarving/testing/3x7.png"};
+            args = new String[] {"Lab7_SeamCarving/testing/6x5.png"};
         }
         Picture picture = new Picture(args[0]);
         StdOut.printf("image is %d pixels wide by %d pixels high.\n", picture.width(), picture.height());
