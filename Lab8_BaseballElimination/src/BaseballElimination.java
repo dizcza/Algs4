@@ -7,7 +7,6 @@ import edu.princeton.cs.algs4.StdOut;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +39,7 @@ public class BaseballElimination {
     // create a baseball division from given filename in format specified below
     public BaseballElimination(String filename) throws FileNotFoundException {
         Scanner scanner = new Scanner(new File(filename));
-        N = scanner.nextInt();
-        scanner.skip("\n");
+        N = Integer.parseInt(scanner.nextLine());
         teamsMap = new HashMap<>(N);
         teamNames = new String[N];
         w = new int[N];
@@ -49,7 +47,7 @@ public class BaseballElimination {
         r = new int[N];
         gamesLeft = new int[N][N];
         for (int i = 0; i < N; ++i) {
-            String line = scanner.nextLine();
+            String line = scanner.nextLine().trim();
             String[] parts = line.split(" +");
             teamNames[i] = parts[0];
             teamsMap.put(teamNames[i], i);
@@ -78,26 +76,26 @@ public class BaseballElimination {
 
     // number of wins for given team
     public int wins(String team) {
-        Objects.requireNonNull(team);
+        validateTeam(team);
         return w[teamsMap.get(team)];
     }
 
     // number of losses for given team
     public int losses(String team) {
-        Objects.requireNonNull(team);
+        validateTeam(team);
         return l[teamsMap.get(team)];
     }
 
     // number of remaining games for given team
     public int remaining(String team) {
-        Objects.requireNonNull(team);
+        validateTeam(team);
         return r[teamsMap.get(team)];
     }
 
     // number of remaining games between team1 and team2
     public int against(String team1, String team2) {
-        Objects.requireNonNull(team1);
-        Objects.requireNonNull(team2);
+        validateTeam(team1);
+        validateTeam(team2);
         return gamesLeft[teamsMap.get(team1)][teamsMap.get(team2)];
     }
 
@@ -107,7 +105,7 @@ public class BaseballElimination {
 
     // is given team eliminated?
     public boolean isEliminated(String team) {
-        Objects.requireNonNull(team);
+        validateTeam(team);
         int teamId = teamsMap.get(team);
         if (isTrivial(teamId)) {
             return true;
@@ -119,7 +117,7 @@ public class BaseballElimination {
 
     // subset R of teamsMap that eliminates given team; null if not eliminated
     public Iterable<String> certificateOfElimination(String team) {
-        Objects.requireNonNull(team);
+        validateTeam(team);
         int teamId = teamsMap.get(team);
         if (isTrivial(teamId)) {
             return Collections.singletonList(teamNames[teamWithMaxWins]);
@@ -129,16 +127,29 @@ public class BaseballElimination {
         }
     }
 
+    private void validateTeam(String team) {
+        Objects.requireNonNull(team);
+        if (teamsMap.get(team) == null) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private Answer buildNetwork(int team) {
-        final int games = (N - 1) * (N - 2) / 2;
-        final int V = games + N + 1;
+        final int games = N * (N - 1) / 2;
+        final int V = games + N + 2;
         final int sink = V - 1;
         final int wr = w[team] + r[team];
         int sourceCapacity = 0;
         FlowNetwork network = new FlowNetwork(V);
+        for (int i = 0; i < N; ++i) {
+            if (i != team) {
+                FlowEdge teamToSink = new FlowEdge(1 + games + i, sink, wr - w[i]);
+                network.addEdge(teamToSink);
+            }
+        }
         for (int i = 0, gid = 1; i < N - 1; ++i) {
             if (i != team) {
-                for (int j = i + 1; j < N; ++j) {
+                for (int j = i + 1; j < N; ++j, ++gid) {
                     if (j != team) {
                         int firstTeam = 1 + games + i;
                         int secondTeam = 1 + games + j;
@@ -146,14 +157,9 @@ public class BaseballElimination {
                         FlowEdge sourceToGame = new FlowEdge(0, gid, gamesLeft[i][j]);
                         FlowEdge toFirstTeam = new FlowEdge(gid, firstTeam, Double.POSITIVE_INFINITY);
                         FlowEdge toSecondTeam = new FlowEdge(gid, secondTeam, Double.POSITIVE_INFINITY);
-                        FlowEdge firstToSink = new FlowEdge(firstTeam, sink, wr - w[i]);
-                        FlowEdge secondToSink = new FlowEdge(secondTeam, sink, wr - w[j]);
                         network.addEdge(sourceToGame);
                         network.addEdge(toFirstTeam);
                         network.addEdge(toSecondTeam);
-                        network.addEdge(firstToSink);
-                        network.addEdge(secondToSink);
-                        gid++;
                     }
                 }
             }
@@ -162,7 +168,8 @@ public class BaseballElimination {
         if (ff.value() < sourceCapacity) {
             List<String> reasons = new ArrayList<>();
             for (int i = 0; i < N; ++i) {
-                if (i != team && ff.inCut(sink - N + 1)) {
+                int tid = sink - N + i;
+                if (i != team && ff.inCut(tid)) {
                     reasons.add(teamNames[i]);
                 }
             }
@@ -173,14 +180,23 @@ public class BaseballElimination {
         }
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        BaseballElimination division = new BaseballElimination("Lab8_BaseballElimination/testing/teams5.txt");
+    private static void testAll() throws FileNotFoundException {
+        File dir = new File("Lab8_BaseballElimination/testing");
+        for (File file : dir.listFiles()) {
+            if (file.getPath().contains("teams")) {
+                test(file.getPath());
+            }
+        }
+    }
+
+    private static void test(String path) throws FileNotFoundException {
+        System.out.println("TESTING " + path);
+        BaseballElimination division = new BaseballElimination(path);
         for (String team : division.teams()) {
-            if (!team.equals("Detroit")) continue;
             if (division.isEliminated(team)) {
                 int tid = division.teamsMap.get(team);
                 if (division.w[tid] + division.r[tid] < division.maxWins) {
-                    StdOut.print("[TRIVIAL] ");
+                    continue;
                 }
                 StdOut.print(team + " is eliminated by the subset R = { ");
                 for (String t : division.certificateOfElimination(team)) {
@@ -192,5 +208,16 @@ public class BaseballElimination {
                 StdOut.println(team + " is not eliminated");
             }
         }
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+        String path;
+        if (args.length == 1) {
+            path = "../testing/" + args[0];
+        }
+        else {
+            path = "Lab8_BaseballElimination/testing/teams5c.txt";
+        }
+        testAll();
     }
 }
