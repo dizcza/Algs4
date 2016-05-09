@@ -1,7 +1,3 @@
-import edu.princeton.cs.algs4.StdIn;
-import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.StdRandom;
-
 import java.util.Arrays;
 
 /**
@@ -16,7 +12,7 @@ import java.util.Arrays;
  *  @author Kevin Wayne
  */
 public class QuickCircularSort {
-    private static final int CUTOFF =  3;   // cutoff to insertion sort
+    private static final int CUTOFF =  15;   // cutoff to insertion sort
 
     // do not instantiate
     private QuickCircularSort() { }
@@ -32,9 +28,6 @@ public class QuickCircularSort {
             index[i] = i;
         }
         sort(a, index, 0, a.length()-1, 0);
-        printSuffixes(a, index);
-//        a = "ABRACADABRA!";
-//        index = new int[] {11, 10, 7, 0, 3, 5, 8, 1, 4, 6, 9, 2};
         assert isSorted(a, index);
         return index;
     }
@@ -86,8 +79,6 @@ public class QuickCircularSort {
                 int d = getFirstNotEqualCharacter(a, index, j, d0);
                 if (d == a.length()) break;
                 if (charAt(a, index[j] + d) < charAt(a, index[j-1] + d)) {
-                    System.out.println(String.format("index[j=%d]=%d, d=%d", j, index[j], d));
-                    printSuffixesBeforeSwap(a, index, j);
                     exch(index, j, j - 1);
                 }
             }
@@ -99,23 +90,6 @@ public class QuickCircularSort {
         int temp = index[i];
         index[i] = index[j];
         index[j] = temp;
-    }
-
-    // is v less than w, starting at character d
-    // DEPRECATED BECAUSE OF SLOW SUBSTRING EXTRACTION IN JAVA 7
-    // private static boolean less(String v, String w, int d) {
-    //    assert v.substring(0, d).equals(w.substring(0, d));
-    //    return v.substring(d).compareTo(w.substring(d)) < 0; 
-    // }
-
-    // is v less than w, starting at character d
-    private static boolean less(String v, String w, int d) {
-        assert v.substring(0, d).equals(w.substring(0, d));
-        for (int i = d; i < Math.min(v.length(), w.length()); i++) {
-            if (v.charAt(i) < w.charAt(i)) return true;
-            if (v.charAt(i) > w.charAt(i)) return false;
-        }
-        return v.length() < w.length();
     }
 
     private static int getFirstNotEqualCharacter(String a, int[] index, int line, int d0) {
@@ -171,7 +145,6 @@ public class QuickCircularSort {
      */
     public static void main(String[] args) {
 
-        // read in the strings from standard input
 //        String a = StdIn.readString();
         String a = "ABRACADABRA!";
 
