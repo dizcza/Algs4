@@ -16,7 +16,7 @@ import java.util.Arrays;
  *  @author Kevin Wayne
  */
 public class QuickCircularSort {
-    private static final int CUTOFF =  15;   // cutoff to insertion sort
+    private static final int CUTOFF =  3;   // cutoff to insertion sort
 
     // do not instantiate
     private QuickCircularSort() { }
@@ -56,19 +56,19 @@ public class QuickCircularSort {
         }
 
         int lt = lo, gt = hi;
-//        int v = charAt(a[lo], d);
-//        int i = lo + 1;
-//        while (i <= gt) {
-//            int t = charAt(a[i], d);
-//            if      (t < v) exch(a, lt++, i++);
-//            else if (t > v) exch(a, i, gt--);
-//            else              i++;
-//        }
+        int v = charAt(a, index[lo] + d);
+        int i = lo + 1;
+        while (i <= gt) {
+            int t = charAt(a, index[i] + d);
+            if      (t < v) exch(index, lt++, i++);
+            else if (t > v) exch(index, i, gt--);
+            else              i++;
+        }
 
         // a[lo..lt-1] < v = a[lt..gt] < a[gt+1..hi]. 
-//        sort(a, lo, lt-1, d);
+        sort(a, index, lo, lt-1, d);
         if (d < a.length() - 1) sort(a, index, lt, gt, d+1);
-//        sort(a, gt+1, hi, d);
+        sort(a, index, gt+1, hi, d);
     }
 
     private static void printLine(String a, int[] index, int line) {
