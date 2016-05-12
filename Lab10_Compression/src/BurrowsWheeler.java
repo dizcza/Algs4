@@ -1,5 +1,5 @@
 import edu.princeton.cs.algs4.BinaryStdIn;
-import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.BinaryStdOut;
 
 public class BurrowsWheeler {
 
@@ -7,7 +7,7 @@ public class BurrowsWheeler {
 
     // apply Burrows-Wheeler encoding, reading from standard input and writing to standard output
     public static void encode() {
-        String a = StdIn.readString();
+        String a = BinaryStdIn.readString();
         int index[] = QuickCircularSort.sort(a);
         int first = 0;
         for (int i = 0; i < index.length; ++i) {
@@ -16,17 +16,19 @@ public class BurrowsWheeler {
                 break;
             }
         }
-        System.out.println(first);
+        BinaryStdOut.write(first);
         for (int ai : index) {
             int end = (a.length() - 1 + ai) % a.length();
-            System.out.print(a.charAt(end));
+            BinaryStdOut.write(a.charAt(end));
         }
+        BinaryStdOut.flush();
+        BinaryStdOut.close();
     }
 
     // apply Burrows-Wheeler decoding, reading from standard input and writing to standard output
     public static void decode() {
-        int pointer = StdIn.readInt();
-        String enc = StdIn.readString();
+        int pointer = BinaryStdIn.readInt();
+        String enc = BinaryStdIn.readString();
         char sorted[] = new char[enc.length()];
         int next[] = new int[enc.length()];
         int count[] = new int[R + 1];
@@ -42,9 +44,11 @@ public class BurrowsWheeler {
             next[skip] = i;
         }
         for (int i = 0; i < enc.length(); ++i) {
-            System.out.print(sorted[pointer]);
+            BinaryStdOut.write(sorted[pointer]);
             pointer = next[pointer];
         }
+        BinaryStdOut.flush();
+        BinaryStdOut.close();
     }
 
     // if args[0] is '-', apply Burrows-Wheeler encoding
