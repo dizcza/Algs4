@@ -1,3 +1,5 @@
+import jdk.nashorn.internal.runtime.logging.Logger;
+
 import java.util.Arrays;
 
 /**
@@ -7,9 +9,6 @@ import java.util.Arrays;
  *  For additional documentation,
  *  see <a href="http://algs4.cs.princeton.edu/51radix">Section 5.1</a> of
  *  <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
- *
- *  @author Robert Sedgewick
- *  @author Kevin Wayne
  */
 public class QuickCircularSort {
     private static final int CUTOFF =  15;   // cutoff to insertion sort
@@ -109,6 +108,7 @@ public class QuickCircularSort {
         return true;
     }
 
+    @Logger
     private static void printSuffixes(String a, int[] index) {
         for (int i = 0; i < a.length(); ++i) {
             for (int j = 0; j < a.length(); ++j) {
@@ -120,6 +120,7 @@ public class QuickCircularSort {
         }
     }
 
+    @Logger
     private static void printSuffixesBeforeSwap(String a, int[] index, int line) {
         for (int i = 0; i < a.length(); ++i) {
             for (int j = 0; j < a.length(); ++j) {
