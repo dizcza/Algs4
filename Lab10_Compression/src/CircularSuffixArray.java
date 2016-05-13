@@ -1,7 +1,7 @@
 import java.util.Objects;
 
 public class CircularSuffixArray {
-    private final int index[];
+    private final int[] index;
 
     // circular suffix array of s
     public CircularSuffixArray(String s) {

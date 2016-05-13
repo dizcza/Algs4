@@ -8,7 +8,7 @@ public class BurrowsWheeler {
     // apply Burrows-Wheeler encoding, reading from standard input and writing to standard output
     public static void encode() {
         String a = BinaryStdIn.readString();
-        int index[] = QuickCircularSort.sort(a);
+        int[] index = QuickCircularSort.sort(a);
         int first = 0;
         for (int i = 0; i < index.length; ++i) {
             if (index[i] == 0) {
@@ -29,9 +29,9 @@ public class BurrowsWheeler {
     public static void decode() {
         int pointer = BinaryStdIn.readInt();
         String enc = BinaryStdIn.readString();
-        char sorted[] = new char[enc.length()];
-        int next[] = new int[enc.length()];
-        int count[] = new int[R + 1];
+        char[] sorted = new char[enc.length()];
+        int[] next = new int[enc.length()];
+        int[] count = new int[R + 1];
         for (int i = 0; i < enc.length(); ++i) {
             count[enc.charAt(i) + 1]++;
         }

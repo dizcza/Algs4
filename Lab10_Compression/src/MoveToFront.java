@@ -2,26 +2,17 @@ import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 
 public class MoveToFront {
 
-    private final static int R = 256;
+    private static final int R = 256;
 
-    private static LinkedList<Character> getAlphabet() {
-        LinkedList<Character> alph = new LinkedList<>();
+    private static LinkedNodeList<Character> getAlphabet() {
+        LinkedNodeList<Character> alph = new LinkedNodeList<>();
         for (int r = 0; r < R; ++r) {
             alph.addLast((char) r);
         }
         return alph;
-    }
-
-    private static int getPos(LinkedList<Character> alph, char ch) {
-        Iterator<Character> it = alph.iterator();
-        for (int i = 0; it.hasNext(); ++i) {
-            if (it.next() == ch) return i;
-        }
-        return -1;
     }
 
     // apply move-to-front encoding, reading from standard input and writing to standard output
@@ -34,19 +25,26 @@ public class MoveToFront {
         decode(getAlphabet());
     }
 
-    private static void encode(LinkedList<Character> alph) {
+    private static void encode(LinkedNodeList<Character> alph) {
         while (!BinaryStdIn.isEmpty()) {
-            char ch = BinaryStdIn.readChar();
-            int pos = getPos(alph, ch);
-            alph.remove(pos);
+            char readChar = BinaryStdIn.readChar();
+            LinkedNodeList<Character>.Node<Character> node = null;
+            Iterator<LinkedNodeList<Character>.Node<Character>> it = alph.iterator();
+            int pos = 0;
+            while (it.hasNext()) {
+                node = it.next();
+                if (node.item == readChar) break;
+                pos++;
+            }
+            alph.remove(node);
             BinaryStdOut.write(pos, 8);
-            alph.addFirst(ch);
+            alph.addFirst(readChar);
         }
         BinaryStdOut.flush();
         BinaryStdOut.close();
     }
 
-    private static void decode(LinkedList<Character> alph) {
+    private static void decode(LinkedNodeList<Character> alph) {
         while (!BinaryStdIn.isEmpty()) {
             int pos = BinaryStdIn.readChar();
             char ch = alph.remove(pos);
@@ -58,7 +56,7 @@ public class MoveToFront {
     }
 
     private static void testEncode() {
-        LinkedList<Character> alph = new LinkedList<>();
+        LinkedNodeList<Character> alph = new LinkedNodeList<>();
         for (int r = 0; r < 6; ++r) {
             alph.addLast((char) (r + 'A'));
         }
@@ -66,7 +64,7 @@ public class MoveToFront {
     }
 
     private static void testDecode() {
-        LinkedList<Character> alph = new LinkedList<>();
+        LinkedNodeList<Character> alph = new LinkedNodeList<>();
         for (int r = 0; r < 6; ++r) {
             alph.addLast((char) (r + 'A'));
         }
