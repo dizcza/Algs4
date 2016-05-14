@@ -25,20 +25,35 @@ public class MoveToFront {
         decode(getAlphabet());
     }
 
+    private static boolean alphabetIntegrity(LinkedNodeList<Character> alph) {
+        boolean[] present = new boolean[alph.size()];
+        LinkedNodeList<Character>.Node<Character> node;
+        Iterator<LinkedNodeList<Character>.Node<Character>> it = alph.iterator();
+        while (it.hasNext()) {
+            node = it.next();
+            present[node.item] = true;
+        }
+        for (int i = 0; i < alph.size(); ++i) {
+            if (!present[i]) return false;
+        }
+        return alph.size() == R;
+    }
+
     private static void encode(LinkedNodeList<Character> alph) {
         while (!BinaryStdIn.isEmpty()) {
             char readChar = BinaryStdIn.readChar();
             LinkedNodeList<Character>.Node<Character> node = null;
             Iterator<LinkedNodeList<Character>.Node<Character>> it = alph.iterator();
-            int pos = 0;
+            int pos = -1;
             while (it.hasNext()) {
                 node = it.next();
-                if (node.item == readChar) break;
                 pos++;
+                if (node.item == readChar) break;
             }
             alph.remove(node);
             BinaryStdOut.write(pos, 8);
             alph.addFirst(readChar);
+            assert alphabetIntegrity(alph);
         }
         BinaryStdOut.flush();
         BinaryStdOut.close();

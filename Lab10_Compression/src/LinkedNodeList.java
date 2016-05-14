@@ -93,6 +93,12 @@ public class LinkedNodeList<E> {
         if (node.next != null) {
             node.next.prev = node.prev;
         }
+        if (node == first) {
+            first = node.next;
+        }
+        if (node == last) {
+            last = node.prev;
+        }
         --N;
         return item;
     }
