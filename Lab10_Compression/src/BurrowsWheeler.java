@@ -7,19 +7,19 @@ public class BurrowsWheeler {
 
     // apply Burrows-Wheeler encoding, reading from standard input and writing to standard output
     public static void encode() {
-        String a = BinaryStdIn.readString();
-        int[] index = QuickCircularSort.sort(a);
+        String msgToEncode = BinaryStdIn.readString();
+        CircularSuffixArray csa = new CircularSuffixArray(msgToEncode);
         int first = 0;
-        for (int i = 0; i < index.length; ++i) {
-            if (index[i] == 0) {
+        for (int i = 0; i < csa.length(); ++i) {
+            if (csa.index(i) == 0) {
                 first = i;
                 break;
             }
         }
         BinaryStdOut.write(first);
-        for (int ai : index) {
-            int end = (a.length() - 1 + ai) % a.length();
-            BinaryStdOut.write(a.charAt(end));
+        for (int i = 0; i < csa.length(); ++i) {
+            int end = (msgToEncode.length() - 1 + csa.index(i)) % msgToEncode.length();
+            BinaryStdOut.write(msgToEncode.charAt(end));
         }
         BinaryStdOut.flush();
         BinaryStdOut.close();

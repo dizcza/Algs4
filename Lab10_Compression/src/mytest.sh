@@ -3,10 +3,15 @@ export CLASSPATH="/home/dizcza/algs4/algs4.jar:$CLASSPATH"
 javac *.java
 for txt in shortest/*
 do
-    if [[ $txt == *.txt ]];
+    if [[ $txt == *.txt ]]
     then
-        echo $txt:
-        java -ea MoveToFront - < $txt | java -ea MoveToFront + | grep Exception
-        echo
+        java BurrowsWheeler - < $txt | java BurrowsWheeler + > temp.txt
+        miss="$(diff $txt temp.txt)"
+        if [[ "$miss" -ne "" ]]
+        then
+            echo $txt FAILED
+        fi
     fi
 done
+rm temp.txt
+echo DONE
