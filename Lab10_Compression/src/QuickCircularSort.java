@@ -103,7 +103,7 @@ public class QuickCircularSort {
     private static boolean isSorted(String a, int[] index) {
         for (int i = 1; i < a.length(); i++) {
             int d = getFirstNotEqualCharacter(a, index, i, 0);
-            if (d < a.length() && a.charAt(index[i-1] + d) > a.charAt(index[i] + d)) return false;
+            if (d < a.length() && charAt(a, index[i-1] + d) > charAt(a, index[i] + d)) return false;
         }
         return true;
     }

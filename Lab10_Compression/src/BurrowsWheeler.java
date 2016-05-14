@@ -3,7 +3,7 @@ import edu.princeton.cs.algs4.BinaryStdOut;
 
 public class BurrowsWheeler {
 
-    private final static int R = 256;
+    private static final int R = 256;
 
     // apply Burrows-Wheeler encoding, reading from standard input and writing to standard output
     public static void encode() {

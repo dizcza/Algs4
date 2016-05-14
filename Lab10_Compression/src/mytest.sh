@@ -5,7 +5,7 @@ for txt in shortest/*
 do
     if [[ $txt == *.txt ]]
     then
-        java BurrowsWheeler - < $txt | java BurrowsWheeler + > temp.txt
+        java -ea BurrowsWheeler - < $txt | java -ea BurrowsWheeler + > temp.txt
         miss="$(diff $txt temp.txt)"
         if [[ "$miss" -ne "" ]]
         then
